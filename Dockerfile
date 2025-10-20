@@ -35,6 +35,9 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/prisma ./prisma
 
+# Generate Prisma client in production
+RUN npx prisma generate
+
 # Expose port
 EXPOSE 3000
 
