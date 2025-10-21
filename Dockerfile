@@ -1,47 +1,35 @@
-# --- Base ---
-FROM node:20-alpine AS base
+# ---------- Stage 1: install dependencies ----------
+FROM node:20-alpine AS deps
 WORKDIR /app
+COPY package.json ./
+COPY package-lock.json* ./
+COPY yarn.lock* ./
+COPY pnpm-lock.yaml* ./
+RUN if [ -f package-lock.json ]; then npm ci --include=dev;     elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;     elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile;     else npm i; fi
 
-# Install openssl for Prisma on alpine
-RUN apk add --no-cache openssl
-
-# --- Dependencies ---
-FROM base AS deps
-COPY package*.json ./
-RUN npm ci
-
-# --- Build ---
-FROM base AS build
+# ---------- Stage 2: build ----------
+FROM node:20-alpine AS builder
+WORKDIR /app
+ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npx prisma generate \
- && npm run build
+RUN npx prisma generate
+RUN npm run build
 
-# --- Production deps ---
-FROM base AS prod-deps
-COPY package*.json ./
-RUN npm ci --omit=dev
-
-# --- Production ---
-FROM node:20-alpine AS prod
+# ---------- Stage 3: production runtime ----------
+FROM node:20-alpine AS runner
 WORKDIR /app
-RUN apk add --no-cache openssl
 ENV NODE_ENV=production
 
-# Copy production deps
-COPY --from=prod-deps /app/node_modules ./node_modules
-# Copy app build and needed files
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/prisma ./prisma
+RUN addgroup -S nestjs && adduser -S nestjs -G nestjs
 
-# Generate Prisma client in production
-RUN npx prisma generate
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
 
-# Expose port
+USER nestjs
+
 EXPOSE 3000
-
-# Start command
-CMD ["node", "dist/main.js"]
-
-
+ENV PORT=3000
+CMD ["node", "dist/main"]

@@ -1,13 +1,17 @@
 services:
   - type: web
-    name: travel-web
-    env: docker
-    plan: free
-    autoDeploy: true
+    name: travel-web-app
+    runtime: docker
+    plan: starter
+    region: singapore
     dockerfilePath: ./Dockerfile
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "3000"
       - key: DATABASE_URL
-        sync: false
-    healthCheckPath: /
+        fromDatabase:
+          name: travel-web-db
+          property: connectionString

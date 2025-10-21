@@ -1,15 +1,18 @@
 FROM node:20-alpine
 WORKDIR /app
-# Ensure Prisma binary compatibility
-RUN apk add --no-cache openssl
-ENV NODE_ENV=development
+
+# Install dependencies
 COPY package.json ./
 COPY package-lock.json* ./
 COPY yarn.lock* ./
 COPY pnpm-lock.yaml* ./
 RUN if [ -f package-lock.json ]; then npm ci;     elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;     elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i;     else npm i; fi
-# Generate Prisma client (safe to run even if already generated)
-RUN npx prisma generate || true
+
+# Copy source code
 COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
 EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
