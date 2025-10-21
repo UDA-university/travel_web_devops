@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Web - Đăng ký</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Travel Web</h1>
+            <p>Đăng ký tài khoản để bắt đầu hành trình của bạn</p>
+        </header>
+
+        <!-- Form đăng ký -->
+        <div id="register-section" class="form-section">
+            <h2>Đăng ký tài khoản</h2>
+            <form id="register-form" class="form">
+                <div class="form-group">
+                    <label for="name">Họ và tên:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mật khẩu:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Đăng ký</button>
+            </form>
+        </div>
+
+        <!-- Hiển thị thông tin user sau khi đăng ký -->
+        <div id="user-info-section" class="user-info-section" style="display: none;">
+            <h2>🎉 Đăng ký thành công!</h2>
+            <div class="user-card">
+                <div class="user-avatar">
+                    <span id="user-initial">U</span>
+                </div>
+                <div class="user-details">
+                    <h3 id="user-name">Tên User</h3>
+                    <p id="user-email">email@example.com</p>
+                    <p id="user-id">ID: 123456</p>
+                    <p id="user-created">Ngày tạo: 2025-10-21</p>
+                </div>
+            </div>
+            <button id="register-another" class="btn btn-secondary">Đăng ký tài khoản khác</button>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Đang xử lý...</p>
+        </div>
+
+        <!-- Error message -->
+        <div id="error-message" class="error-message" style="display: none;">
+            <p id="error-text"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
